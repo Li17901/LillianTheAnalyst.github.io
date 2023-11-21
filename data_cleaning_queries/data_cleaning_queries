@@ -1,0 +1,67 @@
+/*
+
+Cleaning Data in SQL Queries
+
+*/
+select * from `Portfolio-C`.nashville_housing_data_for_data_cleaning_csv nhdfdcc;
+
+
+-- Create a new cleaning table
+
+create table `Portfolio-C`.nashville_housing_data_cleaning as select * from `Portfolio-C`.nashville_housing_data_for_data_cleaning_csv nhdfdcc; 
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Standardize Date Format
+select STR_TO_DATE(sale_date, '%M %d, %Y') from `Portfolio-C`.nashville_housing_data_cleaning;
+
+alter table `Portfolio-C`.nashville_housing_data_cleaning
+add column sale_date_new date null;
+
+
+update `Portfolio-C`.nashville_housing_data_cleaning
+set sale_date_new=STR_TO_DATE(sale_date, '%M %d, %Y');
+
+ --------------------------------------------------------------------------------------------------------------------------
+
+-- Populate Property Address data
+ 
+Select *
+From `Portfolio-C`.nashville_housing_data_cleaning
+-- where property_address is null
+order by parcel_id;
+
+select * from `Portfolio-C`.nashville_housing_data_cleaning where LENGTH(property_address)=0;
+
+select
+	a.unique_id,
+	b.unique_id ,
+	a.parcel_id ,
+	a.property_address ,
+	b.parcel_id ,
+	b.property_address ,
+	if(length(a.property_address)= 0,
+	b.property_address,
+	a.property_address)
+from
+	`Portfolio-C`.nashville_housing_data_cleaning a
+join `Portfolio-C`.nashville_housing_data_cleaning b
+	on
+	a.parcel_id = b.parcel_id
+	and a.unique_id != b.unique_id
+where
+	length(a.property_address)= 0;
+
+update
+	`Portfolio-C`.nashville_housing_data_cleaning a
+join `Portfolio-C`.nashville_housing_data_cleaning b
+	on
+	a.parcel_id = b.parcel_id
+	and a.unique_id != b.unique_id
+set
+	a.property_address = if(length(a.property_address)= 0,
+	b.property_address,
+	a.property_address)
+where
+	length(a.property_address)= 0;
