@@ -15,7 +15,7 @@ select
 from
 	`Portfolio-C`.nashville_housing_data_for_data_cleaning_csv nhdfdcc;
 
---------------------------------------------------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------------------------------------------------
 -- Standardize Date Format
 select
 	STR_TO_DATE(sale_date, '%M %d, %Y')
@@ -32,7 +32,7 @@ update
 set
 	sale_date_new = STR_TO_DATE(sale_date, '%M %d, %Y');
 
---------------------------------------------------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------------------------------------------------
 -- Populate Property Address data
 Select
 	*
@@ -97,7 +97,7 @@ from
 where
 	length(a.property_address) = 0;
 
---------------------------------------------------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------------------------------------------------
 -- Breaking out Address into Individual Columns (Address, City, State)
 select
 	property_address
@@ -255,7 +255,7 @@ select
 from
 	`portfolio-c`.nashville_housing_data_cleaning;
 
---------------------------------------------------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------------------------------------------------
 -- Change Y and N to Yes and No in "Sold as Vacant" field
 select
 	distinct (sold_asvacant),
@@ -286,8 +286,9 @@ set
 		else sold_asvacant
 	end;
 
------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Remove Duplicates
+create table nashville_housing_data_cleaning_no_duplicates
 select
 	*
 from
@@ -313,15 +314,15 @@ where
 order by
 	property_address;
 
----------------------------------------------------------------------------------------------------------
+-- -------------------------------------------------------------------------------------------------------
 -- Delete Unused Columns
 Select
 	*
 from
-	`portfolio-c`.nashville_housing_data_cleaning;
+	`portfolio-c`.nashville_housing_data_cleaning_no_duplicates;
 
 ALTER TABLE
-	`portfolio-c`.nashville_housing_data_cleaning DROP COLUMN owner_address,
+	`portfolio-c`.nashville_housing_data_cleaning_no_duplicates DROP COLUMN owner_address,
 	DROP COLUMN tax_district,
 	DROP COLUMN property_address,
 	DROP COLUMN sale_date;
