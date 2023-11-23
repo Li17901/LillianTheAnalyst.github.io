@@ -1,4 +1,4 @@
--- Cleansed dim_calendar Table --
+-- Clean,explore and extract dim_calendar Table --
 SELECT
   *
 from
@@ -35,7 +35,7 @@ SELECT
 from
   `portfolio-e`.dim_calendar;
 
--- Cleansed dim_customers Table --
+-- Clean,explore and extract dim_customers Table --
 SELECT
   *
 from
@@ -53,11 +53,11 @@ SELECT
   c.first_name,
   c.last_name,
   concat(c.first_name, ' ', c.last_name) as full_name,
-  CASE
+  CasE
     c.gender
     WHEN 'M' THEN 'Male'
     WHEN 'F' THEN 'Female'
-  END AS gender,
+  END as gender,
   c.date_first_purchase,
   g.city as customer_city
 from
@@ -66,30 +66,31 @@ from
 order by
   customer_key asc;
 
--- Cleansed dim_products Table --
+-- Clean,explore and extract dim_products Table --
 create table `portfolio-e`.dim_product_exploration as
 SELECT
   p.ProductKey,
-  p.ProductAlternateKey AS product_item_Code,
-  p.EnglishProductName AS product_name,
-  ps.EnglishProductSubcategoryName AS sub_category,
+  p.ProductAlternateKey as product_item_Code,
+  p.EnglishProductName as product_name,
+  ps.EnglishProductSubcategoryName as sub_category,
   -- Joined in from Sub Category Table
-  pc.EnglishProductCategoryName AS product_category,
+  pc.EnglishProductCategoryName as product_category,
   -- Joined in from Category Table
-  p.Color AS product_color,
-  p.Size AS product_size,
-  p.ProductLine AS product_line,
-  p.ModelName AS product_model_name,
-  p.EnglishDescription AS product_description,
-  ifNULL (p.Status, 'Outdated') AS product_status
+  p.Color as product_color,
+  p.Size as product_size,
+  p.ProductLine as product_line,
+  p.ModelName as product_model_name,
+  p.EnglishDescription as product_description,
+  ifNULL (p.Status, 'Outdated') as product_status
 FROM
-  `portfolio-e`.dim_products AS p
-  LEFT JOIN `portfolio-e`.dim_product_subcategory AS ps ON ps.ProductSubcategoryKey = p.ProductSubcategoryKey
-  LEFT JOIN `portfolio-e`.dim_product_category AS pc ON ps.ProductCategoryKey = pc.ProductCategoryKey
+  `portfolio-e`.dim_products as p
+  LEFT JOIN `portfolio-e`.dim_product_subcategory as ps ON ps.ProductSubcategoryKey = p.ProductSubcategoryKey
+  LEFT JOIN `portfolio-e`.dim_product_category as pc ON ps.ProductCategoryKey = pc.ProductCategoryKey
 order by
   p.ProductKey asc;
 
--- Cleansed FACT_InternetSales Table --
+-- Clean,explore and extract FACT_InternetSales Table --
+create table `portfolio-e`.dim_fact_InternetSales_exploration as
 SELECT
   ProductKey as product_key,
   OrderDateKey as order_date_key,
@@ -101,6 +102,6 @@ SELECT
 FROM
   `portfolio-e`.fact_internetsales
 WHERE
-  LEFT (OrderDateKey, 4) >= 2019 - -- Ensures always only bring two years of date from extraction.
+  LEFT (OrderDateKey, 4) >= 2019
 ORDER BY
   OrderDateKey asc;
